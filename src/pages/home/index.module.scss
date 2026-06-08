@@ -1,0 +1,184 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, $color-primary 0%, $color-bg-page 30%);
+  padding-bottom: 40rpx;
+}
+
+.header {
+  padding: $spacing-lg $spacing-lg $spacing-md;
+}
+
+.greeting {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  display: block;
+}
+
+.subGreeting {
+  font-size: $font-size-sm;
+  color: $color-accent-gold;
+  margin-top: $spacing-xs;
+  display: block;
+}
+
+.searchWrap {
+  margin: $spacing-md $spacing-lg;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-round;
+  padding: 16rpx $spacing-lg;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  font-size: $font-size-md;
+  color: $color-accent-gold;
+  margin-right: $spacing-sm;
+}
+
+.searchInput {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-white;
+}
+
+.searchPlaceholder {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.swiperWrap {
+  margin: $spacing-md $spacing-lg;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  height: 320rpx;
+}
+
+.swiperImage {
+  width: 100%;
+  height: 320rpx;
+  border-radius: $radius-lg;
+}
+
+.section {
+  margin-top: $spacing-lg;
+  padding: 0 $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionMore {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.communityScroll {
+  width: 100%;
+  @include scroll-x-container;
+}
+
+.communityList {
+  display: flex;
+  gap: $spacing-md;
+  padding-bottom: $spacing-sm;
+}
+
+.communityItem {
+  @include scroll-x-item(280rpx);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.97);
+  }
+}
+
+.communityAvatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-round;
+  margin-bottom: $spacing-sm;
+}
+
+.communityName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  @include text-ellipsis;
+  max-width: 240rpx;
+  display: block;
+  text-align: center;
+}
+
+.communityCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.quickEntries {
+  display: flex;
+  gap: $spacing-md;
+  padding: 0 $spacing-lg;
+  margin-top: $spacing-lg;
+}
+
+.quickEntry {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg $spacing-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: $shadow-card;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.97);
+  }
+}
+
+.quickIcon {
+  font-size: 56rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.quickLabel {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  display: block;
+}
+
+.quickDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.latestList {
+  padding: 0 $spacing-lg;
+}

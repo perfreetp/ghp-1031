@@ -1,0 +1,154 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding: $spacing-lg;
+  padding-bottom: 40rpx;
+}
+
+.header {
+  margin-bottom: $spacing-lg;
+}
+
+.headerTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+}
+
+.headerDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+  display: block;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.reviewCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  overflow: hidden;
+}
+
+.reviewImage {
+  width: 100%;
+  height: 280rpx;
+}
+
+.reviewContent {
+  padding: $spacing-lg;
+}
+
+.reviewTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis-multi(1);
+  display: block;
+}
+
+.reviewMeta {
+  display: flex;
+  gap: $spacing-lg;
+  margin-top: $spacing-sm;
+}
+
+.reviewMetaItem {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.reviewDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: $spacing-sm;
+  @include text-ellipsis-multi(2);
+  display: block;
+  line-height: $line-height-normal;
+}
+
+.reviewActions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.approveBtn {
+  flex: 1;
+  height: $button-height-sm;
+  background: $color-success;
+  border-radius: $radius-button;
+  @include flex-center;
+  @include button-reset;
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.rejectBtn {
+  flex: 1;
+  height: $button-height-sm;
+  background: $color-bg-page;
+  border-radius: $radius-button;
+  @include flex-center;
+  @include button-reset;
+  font-size: $font-size-sm;
+  color: $color-error;
+  font-weight: $font-weight-medium;
+  border: 2rpx solid $color-error;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.reviewedCard {
+  opacity: 0.6;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  margin-top: $spacing-sm;
+}
+
+.statusApproved {
+  background: rgba($color-success, 0.1);
+  color: $color-success;
+}
+
+.statusRejected {
+  background: rgba($color-error, 0.1);
+  color: $color-error;
+}

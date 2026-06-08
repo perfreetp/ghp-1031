@@ -1,0 +1,42 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  width: 100%;
+  @include scroll-x-container;
+}
+
+.tagList {
+  display: flex;
+  padding: 0 $spacing-sm;
+  gap: $spacing-sm;
+  white-space: nowrap;
+}
+
+.tag {
+  @include scroll-x-item(auto);
+  padding: 12rpx 32rpx;
+  background: $color-bg-card;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.tagText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.active {
+  background: $color-primary;
+  border-color: $color-primary;
+}
+
+.activeText {
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
