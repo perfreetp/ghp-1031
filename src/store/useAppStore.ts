@@ -70,16 +70,22 @@ export function getAllCommunities(): Community[] {
 
 export function computeCommunityStats(communityId: string, snapshots: Snapshot[]) {
   const community = getCommunityById(communityId)
-  if (!community) return { snapshotCount: 0, latestDate: '' }
+  if (!community) return { snapshotCount: 0, latestDate: '', noSnapshots: true }
   const approved = snapshots.filter(
     s => s.status === 'approved' && s.communityName === community.name
   )
+  const noSnapshots = approved.length === 0
   return {
     snapshotCount: approved.length,
-    latestDate: approved.length > 0
-      ? approved.sort((a, b) => b.collectDate.localeCompare(a.collectDate))[0].collectDate
-      : community.latestSnapshotDate
+    latestDate: noSnapshots ? '' : approved.sort((a, b) => b.collectDate.localeCompare(a.collectDate))[0].collectDate,
+    noSnapshots
   }
+}
+
+function isRecent(dateStr: string, days: number = 7): boolean {
+  const d = new Date(dateStr)
+  const now = new Date()
+  return (now.getTime() - d.getTime()) < days * 24 * 60 * 60 * 1000
 }
 
 export interface SubscribedCommunityInfo {
@@ -88,8 +94,15 @@ export interface SubscribedCommunityInfo {
   district: string
   snapshotCount: number
   latestDate: string
-  recentSnapshots: Snapshot[]
+  noSnapshots: boolean
+  recentlyAdded: Snapshot[]
   recentlyApproved: Snapshot[]
+}
+
+export interface SubscriptionSummary {
+  totalSubscriptions: number
+  recentUpdateCount: number
+  recentUpdateCommunities: { id: string; name: string }[]
 }
 
 interface AppState {
@@ -117,6 +130,7 @@ interface AppState {
   getMyContributions: () => Snapshot[]
   getMyBookmarks: () => Snapshot[]
   getSubscribedCommunities: () => SubscribedCommunityInfo[]
+  getSubscriptionSummary: () => SubscriptionSummary
   getSnapshotsByCommunity: (communityName: string) => Snapshot[]
   getSnapshotById: (id: string) => Snapshot | undefined
   getSearchMatchedCommunity: (keyword: string) => Community | undefined
@@ -283,8 +297,20 @@ export const useAppStore = create<AppState>((set, get) => ({
         }))
         .sort((a, b) => b.collectDate.localeCompare(a.collectDate))
 
+      const noSnapshots = approved.length === 0
+
+      const recentlyAdded = snapshots
+        .filter(s => s.communityName === community.name && isRecent(s.createdAt))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 3)
+        .map(s => ({
+          ...s,
+          isLiked: likedIds.has(s.id),
+          isBookmarked: bookmarkedIds.has(s.id)
+        }))
+
       const recentlyApproved = snapshots
-        .filter(s => s.status === 'approved' && s.communityName === community.name)
+        .filter(s => s.status === 'approved' && s.communityName === community.name && isRecent(s.createdAt))
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 3)
         .map(s => ({
@@ -298,12 +324,33 @@ export const useAppStore = create<AppState>((set, get) => ({
         name: community.name,
         district: community.district,
         snapshotCount: approved.length,
-        latestDate: approved.length > 0 ? approved[0].collectDate : community.latestSnapshotDate,
-        recentSnapshots: approved.slice(0, 5),
+        latestDate: noSnapshots ? '' : approved[0].collectDate,
+        noSnapshots,
+        recentlyAdded,
         recentlyApproved
       })
     })
     return result
+  },
+
+  getSubscriptionSummary: () => {
+    const { snapshots, subscribedCommunityIds } = get()
+    const recentUpdateCommunities: { id: string; name: string }[] = []
+    subscribedCommunityIds.forEach(cId => {
+      const community = getCommunityById(cId)
+      if (!community) return
+      const hasRecent = snapshots.some(
+        s => s.communityName === community.name && isRecent(s.createdAt)
+      )
+      if (hasRecent) {
+        recentUpdateCommunities.push({ id: cId, name: community.name })
+      }
+    })
+    return {
+      totalSubscriptions: subscribedCommunityIds.size,
+      recentUpdateCount: recentUpdateCommunities.length,
+      recentUpdateCommunities
+    }
   },
 
   getSnapshotsByCommunity: (communityName) => {

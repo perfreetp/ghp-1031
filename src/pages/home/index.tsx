@@ -98,7 +98,14 @@ const HomePage: React.FC = () => {
                 >
                   <Image className={styles.communityAvatar} src={c.coverUrl} mode="aspectFill" />
                   <Text className={styles.communityName}>{c.name}</Text>
-                  <Text className={styles.communityCount}>{stats.snapshotCount}个快照</Text>
+                  {stats.noSnapshots ? (
+                    <Text className={styles.communityNoSnapshot}>暂无快照</Text>
+                  ) : (
+                    <View className={styles.communityStats}>
+                      <Text className={styles.communityCount}>{stats.snapshotCount}个快照</Text>
+                      {stats.latestDate && <Text className={styles.communityDate}>{stats.latestDate}</Text>}
+                    </View>
+                  )}
                 </View>
               )
             })}

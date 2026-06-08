@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { View, Text, ScrollView } from '@tarojs/components'
+import React, { useState, useMemo } from 'react'
+import { View, Text, Input, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import classnames from 'classnames'
 import { useAppStore, getCommunityById } from '@/store/useAppStore'
@@ -9,17 +9,22 @@ import styles from './index.module.scss'
 
 const MinePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('contributions')
+  const [subFilterKeyword, setSubFilterKeyword] = useState('')
+  const [subFilterType, setSubFilterType] = useState<'all' | 'added' | 'approved'>('all')
+
   const {
     toggleLike,
     toggleBookmark,
     getMyContributions,
     getMyBookmarks,
-    getSubscribedCommunities
+    getSubscribedCommunities,
+    getSubscriptionSummary
   } = useAppStore()
 
   const myContributions = getMyContributions()
   const myBookmarks = getMyBookmarks()
   const subscribedCommunities = getSubscribedCommunities()
+  const subscriptionSummary = getSubscriptionSummary()
 
   const tabLabels: { key: TabType; label: string; count: number }[] = [
     { key: 'contributions', label: '我的贡献', count: myContributions.length },
@@ -27,12 +32,36 @@ const MinePage: React.FC = () => {
     { key: 'subscriptions', label: '订阅更新', count: subscribedCommunities.length }
   ]
 
+  const filteredSubCommunities = useMemo(() => {
+    let result = subscribedCommunities
+    if (subFilterKeyword) {
+      const kw = subFilterKeyword.toLowerCase()
+      result = result.filter(c => c.name.toLowerCase().includes(kw))
+    }
+    if (subFilterType !== 'all') {
+      if (subFilterType === 'added') {
+        result = result.filter(c => c.recentlyAdded.length > 0)
+      } else if (subFilterType === 'approved') {
+        result = result.filter(c => c.recentlyApproved.length > 0)
+      }
+    }
+    return result
+  }, [subscribedCommunities, subFilterKeyword, subFilterType])
+
   const handleShare = (id: string) => {
     Taro.showShareMenu({ withShareTicket: true })
   }
 
   const handleCommunityClick = (communityId: string) => {
     Taro.navigateTo({ url: `/pages/topic/index?id=${communityId}` })
+  }
+
+  const handleSnapshotClick = (id: string) => {
+    Taro.navigateTo({ url: `/pages/detail/index?id=${id}` })
+  }
+
+  const handleSummaryClick = () => {
+    setActiveTab('subscriptions')
   }
 
   return (
@@ -62,6 +91,16 @@ const MinePage: React.FC = () => {
         </View>
       </View>
 
+      {subscriptionSummary.recentUpdateCount > 0 && (
+        <View className={styles.summaryBanner} onClick={handleSummaryClick}>
+          <Text className={styles.summaryIcon}>🔔</Text>
+          <Text className={styles.summaryText}>
+            {subscriptionSummary.recentUpdateCount}个订阅社区有新动态
+          </Text>
+          <Text className={styles.summaryArrow}>查看 ›</Text>
+        </View>
+      )}
+
       <View className={styles.tabs}>
         {tabLabels.map((tab) => (
           <View
@@ -79,8 +118,31 @@ const MinePage: React.FC = () => {
 
       {activeTab === 'subscriptions' ? (
         subscribedCommunities.length > 0 ? (
-          <ScrollView scrollY className={styles.listWrap} style={{ height: 'calc(100vh - 440rpx)' }}>
-            {subscribedCommunities.map((community) => (
+          <ScrollView scrollY className={styles.listWrap} style={{ height: 'calc(100vh - 500rpx)' }}>
+            <View className={styles.subFilter}>
+              <Input
+                className={styles.subFilterInput}
+                placeholder="搜索社区名"
+                placeholderClass="subFilterPlaceholder"
+                value={subFilterKeyword}
+                onInput={(e) => setSubFilterKeyword(e.detail.value)}
+              />
+              <View className={styles.subFilterTabs}>
+                {(['all', 'added', 'approved'] as const).map((type) => (
+                  <View
+                    key={type}
+                    className={classnames(styles.subFilterTab, subFilterType === type && styles.subFilterTabActive)}
+                    onClick={() => setSubFilterType(type)}
+                  >
+                    <Text className={classnames(styles.subFilterTabText, subFilterType === type && styles.subFilterTabTextActive)}>
+                      {type === 'all' ? '全部' : type === 'added' ? '有新增' : '有通过'}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {filteredSubCommunities.length > 0 ? filteredSubCommunities.map((community) => (
               <View
                 key={community.id}
                 className={styles.subCard}
@@ -92,24 +154,62 @@ const MinePage: React.FC = () => {
                 </View>
                 <View className={styles.subCardMeta}>
                   <Text className={styles.subCardMetaText}>{community.district}</Text>
-                  <Text className={styles.subCardMetaText}>{community.snapshotCount}个快照</Text>
-                  {community.latestDate && (
-                    <Text className={styles.subCardMetaText}>最新：{community.latestDate}</Text>
+                  {community.noSnapshots ? (
+                    <Text className={styles.subCardMetaText}>暂无快照</Text>
+                  ) : (
+                    <>
+                      <Text className={styles.subCardMetaText}>{community.snapshotCount}个快照</Text>
+                      {community.latestDate && <Text className={styles.subCardMetaText}>最新：{community.latestDate}</Text>}
+                    </>
                   )}
                 </View>
-                {community.recentlyApproved.length > 0 && (
+
+                {community.recentlyAdded.length > 0 && (
                   <View className={styles.subCardUpdates}>
-                    <Text className={styles.subCardUpdatesLabel}>最近通过</Text>
-                    {community.recentlyApproved.slice(0, 2).map((s) => (
-                      <View key={s.id} className={styles.subCardUpdateItem}>
+                    <Text className={styles.subCardUpdatesLabel}>最近新增</Text>
+                    {community.recentlyAdded.slice(0, 2).map((s) => (
+                      <View
+                        key={s.id}
+                        className={styles.subCardUpdateItem}
+                        onClick={(e) => { e.stopPropagation(); handleSnapshotClick(s.id) }}
+                      >
                         <Text className={styles.subCardUpdateDot}>·</Text>
                         <Text className={styles.subCardUpdateText}>{s.title}</Text>
+                        <Text className={styles.subCardUpdateStatus}>待审核</Text>
                       </View>
                     ))}
                   </View>
                 )}
+
+                {community.recentlyApproved.length > 0 && (
+                  <View className={styles.subCardUpdates}>
+                    <Text className={styles.subCardUpdatesLabelApproved}>最近通过</Text>
+                    {community.recentlyApproved.slice(0, 2).map((s) => (
+                      <View
+                        key={s.id}
+                        className={styles.subCardUpdateItem}
+                        onClick={(e) => { e.stopPropagation(); handleSnapshotClick(s.id) }}
+                      >
+                        <Text className={styles.subCardUpdateDotApproved}>·</Text>
+                        <Text className={styles.subCardUpdateText}>{s.title}</Text>
+                        <Text className={styles.subCardUpdateStatusApproved}>已通过</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {community.recentlyAdded.length === 0 && community.recentlyApproved.length === 0 && !community.noSnapshots && (
+                  <View className={styles.subCardNoUpdate}>
+                    <Text className={styles.subCardNoUpdateText}>暂无近期更新</Text>
+                  </View>
+                )}
               </View>
-            ))}
+            )) : (
+              <View className={styles.emptyState}>
+                <Text className={styles.emptyIcon}>📭</Text>
+                <Text className={styles.emptyText}>无匹配的订阅社区</Text>
+              </View>
+            )}
           </ScrollView>
         ) : (
           <View className={styles.emptyState}>

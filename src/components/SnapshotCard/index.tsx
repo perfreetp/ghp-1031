@@ -13,6 +13,7 @@ interface SnapshotCardProps {
   onClaim?: (id: string) => void
   showClaim?: boolean
   showStatus?: boolean
+  onClick?: (id: string) => void
 }
 
 const categoryLabels: Record<string, string> = {
@@ -35,8 +36,17 @@ const SnapshotCard: React.FC<SnapshotCardProps> = ({
   onShare,
   onClaim,
   showClaim = false,
-  showStatus = false
+  showStatus = false,
+  onClick
 }) => {
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick(snapshot.id)
+    } else {
+      Taro.navigateTo({ url: `/pages/detail/index?id=${snapshot.id}` })
+    }
+  }
+
   const handleLike = (e) => {
     e.stopPropagation()
     onLike?.(snapshot.id)
@@ -60,7 +70,7 @@ const SnapshotCard: React.FC<SnapshotCardProps> = ({
   const canClaim = showClaim && !snapshot.isClaimed && snapshot.status === 'approved'
 
   return (
-    <View className={styles.card}>
+    <View className={styles.card} onClick={handleCardClick}>
       <View className={styles.imageWrap}>
         <Image
           className={styles.image}

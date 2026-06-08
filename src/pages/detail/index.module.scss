@@ -1,0 +1,332 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 60rpx;
+}
+
+.heroImage {
+  width: 100%;
+  height: 480rpx;
+}
+
+.body {
+  padding: $spacing-lg;
+  margin-top: -$spacing-xl;
+  background: $color-bg-card;
+  border-radius: $radius-lg $radius-lg 0 0;
+  position: relative;
+}
+
+.categoryTag {
+  padding: 4rpx 16rpx;
+  background: rgba($color-primary, 0.1);
+  border-radius: $radius-round;
+  display: inline-flex;
+  margin-bottom: $spacing-md;
+}
+
+.categoryText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  display: block;
+  line-height: 1.4;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+}
+
+.statusBadge {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+}
+
+.statusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.collectDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-top: $spacing-md;
+}
+
+.tag {
+  padding: 4rpx 16rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+}
+
+.tagText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.desc {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  margin-top: $spacing-lg;
+  display: block;
+  line-height: $line-height-loose;
+}
+
+.urlRow {
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.urlLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.urlValue {
+  flex: 1;
+  font-size: $font-size-xs;
+  color: $color-primary;
+  @include text-ellipsis;
+}
+
+.urlAction {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  margin-left: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.infoSection {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1rpx solid $color-divider;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+}
+
+.infoLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.infoValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.communityEntry {
+  display: flex;
+  align-items: center;
+  padding: 8rpx $spacing-md;
+  background: rgba($color-primary, 0.06);
+  border-radius: $radius-round;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.communityAvatar {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-xs;
+}
+
+.communityName {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.communityArrow {
+  font-size: $font-size-md;
+  color: $color-primary;
+  margin-left: 4rpx;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xl;
+  margin-top: $spacing-lg;
+  padding: $spacing-md 0;
+  border-top: 1rpx solid $color-divider;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.actionIcon {
+  font-size: $font-size-xl;
+  color: $color-text-tertiary;
+}
+
+.liked {
+  color: $color-error;
+}
+
+.bookmarked {
+  color: $color-warning;
+}
+
+.actionCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.claimBtn {
+  margin-top: $spacing-lg;
+  height: $button-height-md;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  @include flex-center;
+  @include button-reset;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.claimBtnText {
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.claimedTag {
+  margin-top: $spacing-lg;
+  padding: 12rpx $spacing-lg;
+  background: rgba($color-success, 0.1);
+  border-radius: $radius-round;
+  display: inline-flex;
+}
+
+.claimedTagText {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.othersClaimedTag {
+  margin-top: $spacing-lg;
+  padding: 12rpx $spacing-lg;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  display: inline-flex;
+}
+
+.othersClaimedTagText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.subBtn {
+  margin-top: $spacing-lg;
+  padding: 16rpx $spacing-xl;
+  background: rgba($color-primary, 0.1);
+  border-radius: $radius-round;
+  display: inline-flex;
+  border: 2rpx solid $color-primary;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.subActive {
+  background: $color-primary;
+  border-color: $color-primary;
+}
+
+.subBtnText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.subBtnTextActive {
+  color: $color-text-white;
+}
+
+.communityLink {
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: rgba($color-primary, 0.05);
+  border-radius: $radius-lg;
+  border: 2rpx solid rgba($color-primary, 0.15);
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.communityLinkText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  display: block;
+  text-align: center;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 0;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

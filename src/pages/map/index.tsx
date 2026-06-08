@@ -8,7 +8,7 @@ import styles from './index.module.scss'
 
 const MapPage: React.FC = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const { snapshots, toggleSubscribe, isSubscribed, getSnapshotsByCommunity } = useAppStore()
+  const { snapshots, toggleSubscribe, isSubscribed } = useAppStore()
 
   const selectedCommunity = mockCommunities.find(c => c.id === selectedId)
 
@@ -23,7 +23,7 @@ const MapPage: React.FC = () => {
       width: 28,
       height: 28,
       callout: {
-        content: `${c.name}\n${stats.snapshotCount}个快照`,
+        content: stats.noSnapshots ? `${c.name}\n暂无快照` : `${c.name}\n${stats.snapshotCount}个快照`,
         display: 'ALWAYS',
         color: '#2D2420',
         fontSize: 12,
@@ -92,8 +92,14 @@ const MapPage: React.FC = () => {
               </View>
             </View>
             <View className={styles.selectedMeta}>
-              <Text className={styles.selectedMetaText}>{stats.snapshotCount}个快照</Text>
-              {stats.latestDate && <Text className={styles.selectedMetaText}>最新：{stats.latestDate}</Text>}
+              {stats.noSnapshots ? (
+                <Text className={styles.selectedMetaText}>暂无快照</Text>
+              ) : (
+                <>
+                  <Text className={styles.selectedMetaText}>{stats.snapshotCount}个快照</Text>
+                  {stats.latestDate && <Text className={styles.selectedMetaText}>最新：{stats.latestDate}</Text>}
+                </>
+              )}
             </View>
             <View className={styles.viewBtn} onClick={() => handleViewSnapshots(selectedCommunity.name)}>
               <Text className={styles.viewBtnText}>查看社区快照</Text>
@@ -119,9 +125,15 @@ const MapPage: React.FC = () => {
                   <Text className={styles.communityDistrict}>{community.district}</Text>
                 </View>
                 <View className={styles.communityRight}>
-                  <View className={styles.communityBadge}>
-                    <Text className={styles.communityBadgeText}>{stats.snapshotCount}个快照</Text>
-                  </View>
+                  {stats.noSnapshots ? (
+                    <View className={styles.communityBadge}>
+                      <Text className={styles.communityBadgeText}>暂无快照</Text>
+                    </View>
+                  ) : (
+                    <View className={styles.communityBadge}>
+                      <Text className={styles.communityBadgeText}>{stats.snapshotCount}个快照</Text>
+                    </View>
+                  )}
                   <View
                     className={classnames(styles.miniSubBtn, isSubscribed(community.id) && styles.miniSubActive)}
                     onClick={(e) => handleSubscribe(community.id, e)}

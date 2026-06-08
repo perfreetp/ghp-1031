@@ -3,7 +3,7 @@ import { View, Text, Image, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import classnames from 'classnames'
 import { mockTopics } from '@/data/topics'
-import { useAppStore, getCommunityById, getCommunityByName, getAllCommunities } from '@/store/useAppStore'
+import { useAppStore, getCommunityById, getCommunityByName, computeCommunityStats } from '@/store/useAppStore'
 import PosterCard from '@/components/PosterCard'
 import styles from './index.module.scss'
 
@@ -46,16 +46,12 @@ function buildTimeline(snapshots: ReturnType<ReturnType<typeof useAppStore>['get
 const TopicPage: React.FC = () => {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null)
   const [communityId, setCommunityId] = useState<string>('')
-  const [detailSnapshotId, setDetailSnapshotId] = useState<string | null>(null)
 
   const {
-    toggleLike,
-    toggleBookmark,
+    snapshots,
     toggleSubscribe,
     isSubscribed,
-    getSnapshotsByCommunity,
-    claimSnapshot,
-    getSnapshotById
+    getSnapshotsByCommunity
   } = useAppStore()
 
   useEffect(() => {
@@ -73,7 +69,6 @@ const TopicPage: React.FC = () => {
   const community = communityId ? getCommunityById(communityId) : undefined
   const communitySnapshots = community ? getSnapshotsByCommunity(community.name) : []
   const timeline = useMemo(() => buildTimeline(communitySnapshots), [communitySnapshots.length])
-  const detailSnapshot = detailSnapshotId ? getSnapshotById(detailSnapshotId) : undefined
 
   const handleTopicClick = (topicId: string) => {
     setSelectedTopicId(topicId)
@@ -91,21 +86,8 @@ const TopicPage: React.FC = () => {
     Taro.showToast({ title: sub ? '已订阅' : '已取消订阅', icon: 'none' })
   }
 
-  const handleShare = (id: string) => {
-    Taro.showShareMenu({ withShareTicket: true })
-  }
-
-  const handleClaim = (id: string) => {
-    claimSnapshot(id)
-    Taro.showToast({ title: '认领成功', icon: 'success' })
-  }
-
   const handleSnapshotClick = (id: string) => {
-    setDetailSnapshotId(id)
-  }
-
-  const handleCloseDetail = () => {
-    setDetailSnapshotId(null)
+    Taro.navigateTo({ url: `/pages/detail/index?id=${id}` })
   }
 
   const announcements = [
@@ -117,6 +99,7 @@ const TopicPage: React.FC = () => {
   ]
 
   if (communityId && community) {
+    const stats = computeCommunityStats(community.id, snapshots)
     return (
       <View className={styles.container}>
         <ScrollView scrollY style={{ height: '100vh' }}>
@@ -124,9 +107,9 @@ const TopicPage: React.FC = () => {
             <Text className={styles.communityTitle}>{community.name}</Text>
             <View className={styles.communityMeta}>
               <Text className={styles.communityMetaText}>{community.district}</Text>
-              <Text className={styles.communityMetaText}>{communitySnapshots.length}个快照</Text>
-              {communitySnapshots.length > 0 && (
-                <Text className={styles.communityMetaText}>最新：{communitySnapshots[0].collectDate}</Text>
+              <Text className={styles.communityMetaText}>{stats.noSnapshots ? '暂无快照' : `${stats.snapshotCount}个快照`}</Text>
+              {!stats.noSnapshots && stats.latestDate && (
+                <Text className={styles.communityMetaText}>最新：{stats.latestDate}</Text>
               )}
             </View>
             <View
@@ -183,97 +166,6 @@ const TopicPage: React.FC = () => {
             )}
           </View>
         </ScrollView>
-
-        {detailSnapshot && (
-          <View className={styles.detailOverlay} onClick={handleCloseDetail}>
-            <View className={styles.detailCard} onClick={(e) => e.stopPropagation()}>
-              <View className={styles.detailClose} onClick={handleCloseDetail}>
-                <Text className={styles.detailCloseText}>✕</Text>
-              </View>
-              <Image className={styles.detailImage} src={detailSnapshot.imageUrl} mode="aspectFill" />
-              <ScrollView scrollY className={styles.detailContent}>
-                <View className={styles.detailCategoryTag}>
-                  <Text className={styles.detailCategoryText}>{categoryLabels[detailSnapshot.category]}</Text>
-                </View>
-                <Text className={styles.detailTitle}>{detailSnapshot.title}</Text>
-                <Text className={styles.detailCommunity}>{detailSnapshot.communityName} · {detailSnapshot.district}</Text>
-
-                <View className={styles.detailTags}>
-                  {detailSnapshot.tags.map((tag, idx) => (
-                    <View key={idx} className={styles.detailTag}>
-                      <Text className={styles.detailTagText}>{tag}</Text>
-                    </View>
-                  ))}
-                </View>
-
-                <Text className={styles.detailDesc}>{detailSnapshot.description}</Text>
-
-                {detailSnapshot.url && (
-                  <View className={styles.detailUrl} onClick={() => {
-                    Taro.setClipboardData({ data: detailSnapshot.url })
-                    Taro.showToast({ title: '链接已复制', icon: 'none' })
-                  }}>
-                    <Text className={styles.detailUrlLabel}>原网址：</Text>
-                    <Text className={styles.detailUrlText}>{detailSnapshot.url}</Text>
-                  </View>
-                )}
-
-                <View className={styles.detailInfo}>
-                  <Text className={styles.detailDate}>采集日期：{detailSnapshot.collectDate}</Text>
-                  {detailSnapshot.contributorName && (
-                    <Text className={styles.detailContributor}>
-                      贡献者：{detailSnapshot.claimedBy === 'u_current' ? '我' : detailSnapshot.contributorName}
-                    </Text>
-                  )}
-                </View>
-
-                <View className={styles.detailActions}>
-                  <View className={styles.detailActionBtn} onClick={() => toggleLike(detailSnapshot.id)}>
-                    <Text className={classnames(styles.detailActionIcon, detailSnapshot.isLiked && styles.detailLiked)}>
-                      {detailSnapshot.isLiked ? '♥' : '♡'}
-                    </Text>
-                    <Text className={styles.detailActionCount}>{detailSnapshot.likes}</Text>
-                  </View>
-                  <View className={styles.detailActionBtn} onClick={() => toggleBookmark(detailSnapshot.id)}>
-                    <Text className={classnames(styles.detailActionIcon, detailSnapshot.isBookmarked && styles.detailBookmarked)}>
-                      {detailSnapshot.isBookmarked ? '★' : '☆'}
-                    </Text>
-                  </View>
-                  <View className={styles.detailActionBtn} onClick={() => handleShare(detailSnapshot.id)}>
-                    <Text className={styles.detailActionIcon}>↗</Text>
-                  </View>
-                </View>
-
-                {!detailSnapshot.isClaimed && detailSnapshot.status === 'approved' && (
-                  <View className={styles.detailClaimBtn} onClick={() => handleClaim(detailSnapshot.id)}>
-                    <Text className={styles.detailClaimBtnText}>认领贡献</Text>
-                  </View>
-                )}
-                {detailSnapshot.isClaimed && detailSnapshot.claimedBy === 'u_current' && (
-                  <View className={styles.detailClaimedTag}>
-                    <Text className={styles.detailClaimedTagText}>已认领</Text>
-                  </View>
-                )}
-                {detailSnapshot.isClaimed && detailSnapshot.claimedBy !== 'u_current' && detailSnapshot.contributorName && (
-                  <View className={styles.detailClaimedTag}>
-                    <Text className={styles.detailClaimedTagText}>贡献者：{detailSnapshot.contributorName}</Text>
-                  </View>
-                )}
-
-                {community && (
-                  <View
-                    className={classnames(styles.detailSubBtn, isSubscribed(community.id) && styles.detailSubActive)}
-                    onClick={() => handleSubscribe(community.id)}
-                  >
-                    <Text className={classnames(styles.detailSubBtnText, isSubscribed(community.id) && styles.detailSubBtnTextActive)}>
-                      {isSubscribed(community.id) ? '✓ 已订阅此社区' : '+ 订阅社区更新'}
-                    </Text>
-                  </View>
-                )}
-              </ScrollView>
-            </View>
-          </View>
-        )}
       </View>
     )
   }

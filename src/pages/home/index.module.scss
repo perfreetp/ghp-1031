@@ -133,7 +133,27 @@
 .communityCount {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
+  display: block;
+}
+
+.communityNoSnapshot {
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
   margin-top: 4rpx;
+  display: block;
+}
+
+.communityStats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 4rpx;
+}
+
+.communityDate {
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+  margin-top: 2rpx;
   display: block;
 }
 
