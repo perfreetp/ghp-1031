@@ -202,3 +202,18 @@
   font-weight: $font-weight-medium;
   white-space: nowrap;
 }
+
+.othersClaimedTag {
+  margin-top: $spacing-md;
+  padding: 8rpx 24rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  display: inline-flex;
+}
+
+.othersClaimedTagText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}

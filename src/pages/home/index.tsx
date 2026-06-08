@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, Input, Image, Swiper, SwiperItem, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { useAppStore } from '@/store/useAppStore'
+import { useAppStore, computeCommunityStats } from '@/store/useAppStore'
 import { mockCommunities } from '@/data/communities'
 import SnapshotCard from '@/components/SnapshotCard'
 import styles from './index.module.scss'
@@ -28,7 +28,7 @@ const HomePage: React.FC = () => {
   const handleSearchConfirm = () => {
     if (searchValue.trim()) {
       Taro.switchTab({ url: '/pages/browse/index' }).then(() => {
-        useAppStore.getState().setSearchKeyword(searchValue.trim())
+        useAppStore.getState().setSearchKeyword(searchValue.trim(), true)
       })
     }
   }
@@ -88,17 +88,20 @@ const HomePage: React.FC = () => {
         </View>
         <ScrollView scrollX className={styles.communityScroll} enhanced showScrollbar={false}>
           <View className={styles.communityList}>
-            {mockCommunities.slice(0, 6).map((c) => (
-              <View
-                key={c.id}
-                className={styles.communityItem}
-                onClick={() => handleCommunityClick(c.id)}
-              >
-                <Image className={styles.communityAvatar} src={c.coverUrl} mode="aspectFill" />
-                <Text className={styles.communityName}>{c.name}</Text>
-                <Text className={styles.communityCount}>{c.snapshotCount}个快照</Text>
-              </View>
-            ))}
+            {mockCommunities.slice(0, 6).map((c) => {
+              const stats = computeCommunityStats(c.id, snapshots)
+              return (
+                <View
+                  key={c.id}
+                  className={styles.communityItem}
+                  onClick={() => handleCommunityClick(c.id)}
+                >
+                  <Image className={styles.communityAvatar} src={c.coverUrl} mode="aspectFill" />
+                  <Text className={styles.communityName}>{c.name}</Text>
+                  <Text className={styles.communityCount}>{stats.snapshotCount}个快照</Text>
+                </View>
+              )
+            })}
           </View>
         </ScrollView>
       </View>

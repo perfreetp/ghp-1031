@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
-import { Snapshot, CategoryType, SortType } from '@/types/index'
+import { Snapshot, CategoryType, SortType, Community } from '@/types/index'
 import { mockSnapshots } from '@/data/snapshots'
+import { mockCommunities } from '@/data/communities'
 
 const STORAGE_KEYS = {
   snapshots: 'archive_snapshots',
@@ -55,6 +56,42 @@ function initSet(key: string): Set<string> {
   return new Set(arr)
 }
 
+export function getCommunityById(id: string): Community | undefined {
+  return mockCommunities.find(c => c.id === id)
+}
+
+export function getCommunityByName(name: string): Community | undefined {
+  return mockCommunities.find(c => c.name === name)
+}
+
+export function getAllCommunities(): Community[] {
+  return mockCommunities
+}
+
+export function computeCommunityStats(communityId: string, snapshots: Snapshot[]) {
+  const community = getCommunityById(communityId)
+  if (!community) return { snapshotCount: 0, latestDate: '' }
+  const approved = snapshots.filter(
+    s => s.status === 'approved' && s.communityName === community.name
+  )
+  return {
+    snapshotCount: approved.length,
+    latestDate: approved.length > 0
+      ? approved.sort((a, b) => b.collectDate.localeCompare(a.collectDate))[0].collectDate
+      : community.latestSnapshotDate
+  }
+}
+
+export interface SubscribedCommunityInfo {
+  id: string
+  name: string
+  district: string
+  snapshotCount: number
+  latestDate: string
+  recentSnapshots: Snapshot[]
+  recentlyApproved: Snapshot[]
+}
+
 interface AppState {
   snapshots: Snapshot[]
   likedIds: Set<string>
@@ -64,7 +101,7 @@ interface AppState {
   category: CategoryType
   sortType: SortType
 
-  setSearchKeyword: (keyword: string) => void
+  setSearchKeyword: (keyword: string, resetCategory?: boolean) => void
   setCategory: (category: CategoryType) => void
   setSortType: (sortType: SortType) => void
   toggleLike: (id: string) => void
@@ -79,8 +116,10 @@ interface AppState {
   getPendingSnapshots: () => Snapshot[]
   getMyContributions: () => Snapshot[]
   getMyBookmarks: () => Snapshot[]
-  getSubscribedCommunities: () => { id: string; name: string; latestDate: string }[]
+  getSubscribedCommunities: () => SubscribedCommunityInfo[]
   getSnapshotsByCommunity: (communityName: string) => Snapshot[]
+  getSnapshotById: (id: string) => Snapshot | undefined
+  getSearchMatchedCommunity: (keyword: string) => Community | undefined
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -92,7 +131,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   category: 'all',
   sortType: 'latest',
 
-  setSearchKeyword: (keyword) => set({ searchKeyword: keyword }),
+  setSearchKeyword: (keyword, resetCategory = false) => set((state) => {
+    const updates: Partial<AppState> = { searchKeyword: keyword }
+    if (resetCategory && keyword) {
+      updates.category = 'all'
+    }
+    return updates
+  }),
+
   setCategory: (category) => set({ category }),
   setSortType: (sortType) => set({ sortType }),
 
@@ -223,23 +269,39 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   getSubscribedCommunities: () => {
-    const { snapshots, subscribedCommunityIds } = get()
-    const communityMap = new Map<string, { name: string; latestDate: string }>()
-    snapshots.filter(s => s.status === 'approved').forEach(s => {
-      const existing = communityMap.get(s.communityName)
-      if (!existing || s.collectDate > existing.latestDate) {
-        communityMap.set(s.communityName, { name: s.communityName, latestDate: s.collectDate })
-      }
-    })
-    const result: { id: string; name: string; latestDate: string }[] = []
+    const { snapshots, subscribedCommunityIds, likedIds, bookmarkedIds } = get()
+    const result: SubscribedCommunityInfo[] = []
     subscribedCommunityIds.forEach(cId => {
-      const match = [...communityMap.entries()].find(([name]) => {
-        const communityName = name
-        return communityName.includes(cId.replace('c', '社区')) || cId !== ''
+      const community = getCommunityById(cId)
+      if (!community) return
+      const approved = snapshots
+        .filter(s => s.status === 'approved' && s.communityName === community.name)
+        .map(s => ({
+          ...s,
+          isLiked: likedIds.has(s.id),
+          isBookmarked: bookmarkedIds.has(s.id)
+        }))
+        .sort((a, b) => b.collectDate.localeCompare(a.collectDate))
+
+      const recentlyApproved = snapshots
+        .filter(s => s.status === 'approved' && s.communityName === community.name)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 3)
+        .map(s => ({
+          ...s,
+          isLiked: likedIds.has(s.id),
+          isBookmarked: bookmarkedIds.has(s.id)
+        }))
+
+      result.push({
+        id: cId,
+        name: community.name,
+        district: community.district,
+        snapshotCount: approved.length,
+        latestDate: approved.length > 0 ? approved[0].collectDate : community.latestSnapshotDate,
+        recentSnapshots: approved.slice(0, 5),
+        recentlyApproved
       })
-      if (match) {
-        result.push({ id: cId, name: match[1].name, latestDate: match[1].latestDate })
-      }
     })
     return result
   },
@@ -253,5 +315,23 @@ export const useAppStore = create<AppState>((set, get) => ({
         isLiked: likedIds.has(s.id),
         isBookmarked: bookmarkedIds.has(s.id)
       }))
+      .sort((a, b) => b.collectDate.localeCompare(a.collectDate))
+  },
+
+  getSnapshotById: (id) => {
+    const { snapshots, likedIds, bookmarkedIds } = get()
+    const s = snapshots.find(s => s.id === id)
+    if (!s) return undefined
+    return {
+      ...s,
+      isLiked: likedIds.has(s.id),
+      isBookmarked: bookmarkedIds.has(s.id)
+    }
+  },
+
+  getSearchMatchedCommunity: (keyword) => {
+    if (!keyword) return undefined
+    const kw = keyword.toLowerCase()
+    return mockCommunities.find(c => c.name.toLowerCase().includes(kw))
   }
 }))

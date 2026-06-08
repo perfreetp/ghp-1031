@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Input, ScrollView } from '@tarojs/components'
+import { View, Text, Input, Image, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import classnames from 'classnames'
-import { useAppStore } from '@/store/useAppStore'
+import { useAppStore, getCommunityById } from '@/store/useAppStore'
 import { CategoryType, SortType } from '@/types/index'
 import TagFilter from '@/components/TagFilter'
 import SnapshotCard from '@/components/SnapshotCard'
@@ -19,7 +19,8 @@ const BrowsePage: React.FC = () => {
     toggleLike,
     toggleBookmark,
     claimSnapshot,
-    getFilteredSnapshots
+    getFilteredSnapshots,
+    getSearchMatchedCommunity
   } = useAppStore()
 
   const [localKeyword, setLocalKeyword] = useState(searchKeyword)
@@ -28,7 +29,7 @@ const BrowsePage: React.FC = () => {
     const params = Taro.getCurrentInstance().router?.params
     if (params?.keyword) {
       const kw = decodeURIComponent(params.keyword)
-      setSearchKeyword(kw)
+      setSearchKeyword(kw, true)
       setLocalKeyword(kw)
     }
   }, [])
@@ -38,7 +39,7 @@ const BrowsePage: React.FC = () => {
   }, [searchKeyword])
 
   const handleSearchConfirm = () => {
-    setSearchKeyword(localKeyword)
+    setSearchKeyword(localKeyword, true)
   }
 
   const handleSortChange = (type: SortType) => {
@@ -52,7 +53,6 @@ const BrowsePage: React.FC = () => {
   const handleClaim = (id: string) => {
     claimSnapshot(id)
     Taro.showToast({ title: '认领成功', icon: 'success' })
-    console.info('[Browse] Claimed snapshot:', id)
   }
 
   const handleClearSearch = () => {
@@ -61,6 +61,13 @@ const BrowsePage: React.FC = () => {
   }
 
   const filteredSnapshots = getFilteredSnapshots()
+  const matchedCommunity = searchKeyword ? getSearchMatchedCommunity(searchKeyword) : undefined
+
+  const handleCommunityEntry = () => {
+    if (matchedCommunity) {
+      Taro.navigateTo({ url: `/pages/topic/index?id=${matchedCommunity.id}` })
+    }
+  }
 
   return (
     <View className={styles.container}>
@@ -86,6 +93,17 @@ const BrowsePage: React.FC = () => {
           <Text className={styles.searchHintText}>
             搜索「{searchKeyword}」找到 {filteredSnapshots.length} 个结果
           </Text>
+        </View>
+      )}
+
+      {matchedCommunity && searchKeyword && (
+        <View className={styles.communityEntry} onClick={handleCommunityEntry}>
+          <Image className={styles.communityEntryAvatar} src={matchedCommunity.coverUrl} mode="aspectFill" />
+          <View className={styles.communityEntryInfo}>
+            <Text className={styles.communityEntryName}>{matchedCommunity.name}</Text>
+            <Text className={styles.communityEntryDistrict}>{matchedCommunity.district}</Text>
+          </View>
+          <Text className={styles.communityEntryArrow}>查看时间线 ›</Text>
         </View>
       )}
 

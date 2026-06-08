@@ -127,6 +127,12 @@ const SnapshotCard: React.FC<SnapshotCardProps> = ({
             <Text className={styles.claimedTagText}>已认领</Text>
           </View>
         )}
+
+        {showClaim && snapshot.isClaimed && snapshot.claimedBy !== 'u_current' && snapshot.contributorName && (
+          <View className={styles.othersClaimedTag}>
+            <Text className={styles.othersClaimedTagText}>贡献者：{snapshot.contributorName}</Text>
+          </View>
+        )}
       </View>
     </View>
   )

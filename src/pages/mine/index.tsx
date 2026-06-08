@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View, Text, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import classnames from 'classnames'
-import { useAppStore } from '@/store/useAppStore'
+import { useAppStore, getCommunityById } from '@/store/useAppStore'
 import { TabType } from '@/types/index'
 import SnapshotCard from '@/components/SnapshotCard'
 import styles from './index.module.scss'
@@ -31,8 +31,8 @@ const MinePage: React.FC = () => {
     Taro.showShareMenu({ withShareTicket: true })
   }
 
-  const handleTopicClick = (communityName: string) => {
-    Taro.navigateTo({ url: `/pages/topic/index?communityName=${encodeURIComponent(communityName)}` })
+  const handleCommunityClick = (communityId: string) => {
+    Taro.navigateTo({ url: `/pages/topic/index?id=${communityId}` })
   }
 
   return (
@@ -79,32 +79,48 @@ const MinePage: React.FC = () => {
 
       {activeTab === 'subscriptions' ? (
         subscribedCommunities.length > 0 ? (
-          <View className={styles.listWrap}>
+          <ScrollView scrollY className={styles.listWrap} style={{ height: 'calc(100vh - 440rpx)' }}>
             {subscribedCommunities.map((community) => (
               <View
                 key={community.id}
-                className={styles.actionCard}
-                onClick={() => handleTopicClick(community.name)}
+                className={styles.subCard}
+                onClick={() => handleCommunityClick(community.id)}
               >
-                <Text className={styles.actionIcon}>📖</Text>
-                <View className={styles.actionInfo}>
-                  <Text className={styles.actionTitle}>{community.name}</Text>
-                  <Text className={styles.actionDesc}>最新快照：{community.latestDate}</Text>
+                <View className={styles.subCardHeader}>
+                  <Text className={styles.subCardName}>{community.name}</Text>
+                  <Text className={styles.subCardArrow}>›</Text>
                 </View>
-                <Text className={styles.actionArrow}>›</Text>
+                <View className={styles.subCardMeta}>
+                  <Text className={styles.subCardMetaText}>{community.district}</Text>
+                  <Text className={styles.subCardMetaText}>{community.snapshotCount}个快照</Text>
+                  {community.latestDate && (
+                    <Text className={styles.subCardMetaText}>最新：{community.latestDate}</Text>
+                  )}
+                </View>
+                {community.recentlyApproved.length > 0 && (
+                  <View className={styles.subCardUpdates}>
+                    <Text className={styles.subCardUpdatesLabel}>最近通过</Text>
+                    {community.recentlyApproved.slice(0, 2).map((s) => (
+                      <View key={s.id} className={styles.subCardUpdateItem}>
+                        <Text className={styles.subCardUpdateDot}>·</Text>
+                        <Text className={styles.subCardUpdateText}>{s.title}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
             ))}
-          </View>
+          </ScrollView>
         ) : (
           <View className={styles.emptyState}>
-            <Text className={styles.emptyIcon}>�</Text>
+            <Text className={styles.emptyIcon}>📭</Text>
             <Text className={styles.emptyText}>暂无订阅社区</Text>
             <Text className={styles.emptyHint}>在地图索引或社区专题中订阅</Text>
           </View>
         )
       ) : activeTab === 'contributions' ? (
         myContributions.length > 0 ? (
-          <View className={styles.listWrap}>
+          <ScrollView scrollY className={styles.listWrap} style={{ height: 'calc(100vh - 440rpx)' }}>
             {myContributions.map((snapshot) => (
               <SnapshotCard
                 key={snapshot.id}
@@ -115,7 +131,7 @@ const MinePage: React.FC = () => {
                 showStatus={true}
               />
             ))}
-          </View>
+          </ScrollView>
         ) : (
           <View className={styles.emptyState}>
             <Text className={styles.emptyIcon}>📭</Text>
@@ -124,7 +140,7 @@ const MinePage: React.FC = () => {
           </View>
         )
       ) : myBookmarks.length > 0 ? (
-        <View className={styles.listWrap}>
+        <ScrollView scrollY className={styles.listWrap} style={{ height: 'calc(100vh - 440rpx)' }}>
           {myBookmarks.map((snapshot) => (
             <SnapshotCard
               key={snapshot.id}
@@ -134,7 +150,7 @@ const MinePage: React.FC = () => {
               onShare={handleShare}
             />
           ))}
-        </View>
+        </ScrollView>
       ) : (
         <View className={styles.emptyState}>
           <Text className={styles.emptyIcon}>📭</Text>

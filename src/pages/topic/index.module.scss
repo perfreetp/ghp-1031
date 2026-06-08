@@ -139,7 +139,7 @@
 }
 
 .communityHeader {
-  padding: $spacing-lg;
+  padding: $spacing-xl $spacing-lg $spacing-lg;
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
 }
 
@@ -152,8 +152,9 @@
 
 .communityMeta {
   display: flex;
-  gap: $spacing-lg;
+  gap: $spacing-md;
   margin-top: $spacing-sm;
+  flex-wrap: wrap;
 }
 
 .communityMetaText {
@@ -190,8 +191,124 @@
   color: $color-primary;
 }
 
-.communitySnapshotList {
+.timelineWrap {
   padding: $spacing-lg;
+}
+
+.timelineYear {
+  margin-bottom: $spacing-lg;
+}
+
+.yearHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.yearDot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.yearText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.timelineMonth {
+  display: flex;
+  padding-left: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.monthLine {
+  width: 4rpx;
+  background: rgba($color-primary, 0.15);
+  border-radius: 2rpx;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.monthContent {
+  flex: 1;
+}
+
+.monthLabel {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.monthSnapshots {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.timelineCard {
+  display: flex;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+
+  &:active {
+    opacity: 0.95;
+    transform: scale(0.99);
+  }
+}
+
+.timelineCardImage {
+  width: 200rpx;
+  height: 200rpx;
+  flex-shrink: 0;
+}
+
+.timelineCardContent {
+  flex: 1;
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.timelineCardCategory {
+  padding: 2rpx 12rpx;
+  background: rgba($color-primary, 0.1);
+  border-radius: $radius-round;
+  display: inline-flex;
+  align-self: flex-start;
+  margin-bottom: $spacing-xs;
+}
+
+.timelineCardCategoryText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.timelineCardTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  @include text-ellipsis-multi(2);
+  display: block;
+  line-height: 1.4;
+}
+
+.timelineCardDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+  display: block;
 }
 
 .emptyState {
@@ -209,4 +326,247 @@
 .emptyText {
   font-size: $font-size-md;
   color: $color-text-tertiary;
+}
+
+.detailOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  @include flex-center;
+}
+
+.detailCard {
+  width: 90%;
+  max-height: 85vh;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  position: relative;
+}
+
+.detailClose {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background: rgba(0, 0, 0, 0.4);
+  @include flex-center;
+  z-index: 10;
+}
+
+.detailCloseText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+}
+
+.detailImage {
+  width: 100%;
+  height: 400rpx;
+}
+
+.detailContent {
+  padding: $spacing-lg;
+  max-height: 45vh;
+}
+
+.detailCategoryTag {
+  padding: 4rpx 16rpx;
+  background: rgba($color-primary, 0.1);
+  border-radius: $radius-round;
+  display: inline-flex;
+  align-self: flex-start;
+  margin-bottom: $spacing-sm;
+}
+
+.detailCategoryText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.detailTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  line-height: 1.4;
+}
+
+.detailCommunity {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+  display: block;
+}
+
+.detailTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-top: $spacing-md;
+}
+
+.detailTag {
+  padding: 4rpx 16rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+}
+
+.detailTagText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.detailDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: $spacing-md;
+  display: block;
+  line-height: $line-height-normal;
+}
+
+.detailUrl {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: flex-start;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.detailUrlLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+  margin-right: $spacing-xs;
+}
+
+.detailUrlText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  @include text-ellipsis;
+}
+
+.detailInfo {
+  margin-top: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.detailDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.detailContributor {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.detailActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.detailActionBtn {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.detailActionIcon {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+}
+
+.detailLiked {
+  color: $color-error;
+}
+
+.detailBookmarked {
+  color: $color-warning;
+}
+
+.detailActionCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.detailClaimBtn {
+  margin-top: $spacing-md;
+  height: $button-height-sm;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  @include flex-center;
+  @include button-reset;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.detailClaimBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.detailClaimedTag {
+  margin-top: $spacing-md;
+  padding: 8rpx 24rpx;
+  background: rgba($color-success, 0.1);
+  border-radius: $radius-round;
+  display: inline-flex;
+}
+
+.detailClaimedTagText {
+  font-size: $font-size-xs;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.detailSubBtn {
+  margin-top: $spacing-md;
+  padding: 16rpx $spacing-xl;
+  background: rgba($color-primary, 0.1);
+  border-radius: $radius-round;
+  display: inline-flex;
+  border: 2rpx solid $color-primary;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.detailSubActive {
+  background: $color-primary;
+  border-color: $color-primary;
+}
+
+.detailSubBtnText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.detailSubBtnTextActive {
+  color: $color-text-white;
 }

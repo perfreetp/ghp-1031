@@ -160,6 +160,81 @@
   color: $color-text-tertiary;
 }
 
+.subCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+
+  &:active {
+    opacity: 0.95;
+  }
+}
+
+.subCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subCardName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.subCardArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+}
+
+.subCardMeta {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.subCardMetaText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.subCardUpdates {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.subCardUpdatesLabel {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-xs;
+  display: block;
+}
+
+.subCardUpdateItem {
+  display: flex;
+  align-items: flex-start;
+  margin-top: $spacing-xs;
+}
+
+.subCardUpdateDot {
+  font-size: $font-size-md;
+  color: $color-primary;
+  margin-right: $spacing-xs;
+  line-height: 1.6;
+}
+
+.subCardUpdateText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+  flex: 1;
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;
