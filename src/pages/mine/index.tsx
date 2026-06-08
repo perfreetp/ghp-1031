@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { View, Text, Input, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import classnames from 'classnames'
-import { useAppStore, getCommunityById } from '@/store/useAppStore'
+import { useAppStore } from '@/store/useAppStore'
 import { TabType } from '@/types/index'
 import SnapshotCard from '@/components/SnapshotCard'
 import styles from './index.module.scss'
@@ -15,6 +15,10 @@ const MinePage: React.FC = () => {
   const {
     toggleLike,
     toggleBookmark,
+    toggleSubscribe,
+    isSubscribed,
+    markSnapshotRead,
+    markAllSubscriptionRead,
     getMyContributions,
     getMyBookmarks,
     getSubscribedCommunities,
@@ -57,11 +61,23 @@ const MinePage: React.FC = () => {
   }
 
   const handleSnapshotClick = (id: string) => {
+    markSnapshotRead(id)
     Taro.navigateTo({ url: `/pages/detail/index?id=${id}` })
   }
 
   const handleSummaryClick = () => {
-    setActiveTab('subscriptions')
+    Taro.navigateTo({ url: '/pages/updates/index?filter=unread' })
+  }
+
+  const handleUnsubscribe = (communityId: string, e?) => {
+    if (e) e.stopPropagation()
+    toggleSubscribe(communityId)
+    Taro.showToast({ title: '已取消订阅', icon: 'none' })
+  }
+
+  const handleMarkAllRead = () => {
+    markAllSubscriptionRead()
+    Taro.showToast({ title: '全部已读', icon: 'success' })
   }
 
   return (
@@ -91,11 +107,11 @@ const MinePage: React.FC = () => {
         </View>
       </View>
 
-      {subscriptionSummary.recentUpdateCount > 0 && (
+      {subscriptionSummary.unreadUpdateCount > 0 && (
         <View className={styles.summaryBanner} onClick={handleSummaryClick}>
           <Text className={styles.summaryIcon}>🔔</Text>
           <Text className={styles.summaryText}>
-            {subscriptionSummary.recentUpdateCount}个订阅社区有新动态
+            {subscriptionSummary.unreadUpdateCount}条未读更新
           </Text>
           <Text className={styles.summaryArrow}>查看 ›</Text>
         </View>
@@ -119,6 +135,12 @@ const MinePage: React.FC = () => {
       {activeTab === 'subscriptions' ? (
         subscribedCommunities.length > 0 ? (
           <ScrollView scrollY className={styles.listWrap} style={{ height: 'calc(100vh - 500rpx)' }}>
+            {subscriptionSummary.unreadUpdateCount > 0 && (
+              <View className={styles.markAllRow} onClick={handleMarkAllRead}>
+                <Text className={styles.markAllRowText}>全部标为已读</Text>
+              </View>
+            )}
+
             <View className={styles.subFilter}>
               <Input
                 className={styles.subFilterInput}
@@ -149,8 +171,19 @@ const MinePage: React.FC = () => {
                 onClick={() => handleCommunityClick(community.id)}
               >
                 <View className={styles.subCardHeader}>
-                  <Text className={styles.subCardName}>{community.name}</Text>
-                  <Text className={styles.subCardArrow}>›</Text>
+                  <View className={styles.subCardTitleWrap}>
+                    {community.unreadCount > 0 && <View className={styles.unreadDot} />}
+                    <Text className={styles.subCardName}>{community.name}</Text>
+                  </View>
+                  <View className={styles.subCardActions}>
+                    <View
+                      className={styles.unsubscribeBtn}
+                      onClick={(e) => handleUnsubscribe(community.id, e)}
+                    >
+                      <Text className={styles.unsubscribeBtnText}>取消订阅</Text>
+                    </View>
+                    <Text className={styles.subCardArrow}>›</Text>
+                  </View>
                 </View>
                 <View className={styles.subCardMeta}>
                   <Text className={styles.subCardMetaText}>{community.district}</Text>

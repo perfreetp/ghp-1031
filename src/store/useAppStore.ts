@@ -8,7 +8,8 @@ const STORAGE_KEYS = {
   snapshots: 'archive_snapshots',
   likedIds: 'archive_liked',
   bookmarkedIds: 'archive_bookmarked',
-  subscribedIds: 'archive_subscribed'
+  subscribedIds: 'archive_subscribed',
+  readSnapshotIds: 'archive_read_snapshots'
 }
 
 function loadFromStorage<T>(key: string, fallback: T): T {
@@ -43,6 +44,10 @@ function persistBookmarkedIds(ids: string[]) {
 
 function persistSubscribedIds(ids: string[]) {
   saveToStorage(STORAGE_KEYS.subscribedIds, ids)
+}
+
+function persistReadSnapshotIds(ids: string[]) {
+  saveToStorage(STORAGE_KEYS.readSnapshotIds, ids)
 }
 
 function initSnapshots(): Snapshot[] {
@@ -88,6 +93,17 @@ function isRecent(dateStr: string, days: number = 7): boolean {
   return (now.getTime() - d.getTime()) < days * 24 * 60 * 60 * 1000
 }
 
+export interface UpdateItem {
+  id: string
+  snapshotId: string
+  communityId: string
+  communityName: string
+  title: string
+  type: 'added' | 'approved'
+  isRead: boolean
+  date: string
+}
+
 export interface SubscribedCommunityInfo {
   id: string
   name: string
@@ -97,12 +113,13 @@ export interface SubscribedCommunityInfo {
   noSnapshots: boolean
   recentlyAdded: Snapshot[]
   recentlyApproved: Snapshot[]
+  unreadCount: number
 }
 
 export interface SubscriptionSummary {
   totalSubscriptions: number
+  unreadUpdateCount: number
   recentUpdateCount: number
-  recentUpdateCommunities: { id: string; name: string }[]
 }
 
 interface AppState {
@@ -110,6 +127,7 @@ interface AppState {
   likedIds: Set<string>
   bookmarkedIds: Set<string>
   subscribedCommunityIds: Set<string>
+  readSnapshotIds: Set<string>
   searchKeyword: string
   category: CategoryType
   sortType: SortType
@@ -125,11 +143,16 @@ interface AppState {
   approveSnapshot: (id: string) => void
   rejectSnapshot: (id: string) => void
   claimSnapshot: (id: string) => void
+  markSnapshotRead: (id: string) => void
+  markAllSubscriptionRead: () => void
+  isSnapshotRead: (id: string) => boolean
+  getUnreadUpdateCount: () => number
   getFilteredSnapshots: () => Snapshot[]
   getPendingSnapshots: () => Snapshot[]
   getMyContributions: () => Snapshot[]
   getMyBookmarks: () => Snapshot[]
   getSubscribedCommunities: () => SubscribedCommunityInfo[]
+  getSubscriptionUpdates: () => UpdateItem[]
   getSubscriptionSummary: () => SubscriptionSummary
   getSnapshotsByCommunity: (communityName: string) => Snapshot[]
   getSnapshotById: (id: string) => Snapshot | undefined
@@ -141,6 +164,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   likedIds: initSet(STORAGE_KEYS.likedIds),
   bookmarkedIds: initSet(STORAGE_KEYS.bookmarkedIds),
   subscribedCommunityIds: initSet(STORAGE_KEYS.subscribedIds),
+  readSnapshotIds: initSet(STORAGE_KEYS.readSnapshotIds),
   searchKeyword: '',
   category: 'all',
   sortType: 'latest',
@@ -200,8 +224,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   }),
 
   approveSnapshot: (id) => set((state) => {
+    const now = new Date().toISOString()
     const newSnapshots = state.snapshots.map(s =>
-      s.id === id ? { ...s, status: 'approved' as const } : s
+      s.id === id ? { ...s, status: 'approved' as const, approvedAt: now } : s
     )
     persistSnapshots(newSnapshots)
     return { snapshots: newSnapshots }
@@ -222,6 +247,46 @@ export const useAppStore = create<AppState>((set, get) => ({
     persistSnapshots(newSnapshots)
     return { snapshots: newSnapshots }
   }),
+
+  markSnapshotRead: (id) => set((state) => {
+    const newRead = new Set(state.readSnapshotIds)
+    newRead.add(id)
+    persistReadSnapshotIds([...newRead])
+    return { readSnapshotIds: newRead }
+  }),
+
+  markAllSubscriptionRead: () => set((state) => {
+    const { snapshots, subscribedCommunityIds, readSnapshotIds } = get()
+    const newRead = new Set(readSnapshotIds)
+    subscribedCommunityIds.forEach(cId => {
+      const community = getCommunityById(cId)
+      if (!community) return
+      snapshots
+        .filter(s => s.communityName === community.name && isRecent(s.createdAt))
+        .forEach(s => newRead.add(s.id))
+    })
+    persistReadSnapshotIds([...newRead])
+    return { readSnapshotIds: newRead }
+  }),
+
+  isSnapshotRead: (id) => {
+    return get().readSnapshotIds.has(id)
+  },
+
+  getUnreadUpdateCount: () => {
+    const { snapshots, subscribedCommunityIds, readSnapshotIds } = get()
+    let count = 0
+    subscribedCommunityIds.forEach(cId => {
+      const community = getCommunityById(cId)
+      if (!community) return
+      snapshots
+        .filter(s => s.communityName === community.name && isRecent(s.createdAt))
+        .forEach(s => {
+          if (!readSnapshotIds.has(s.id)) count++
+        })
+    })
+    return count
+  },
 
   getFilteredSnapshots: () => {
     const { snapshots, searchKeyword, category, sortType, likedIds, bookmarkedIds } = get()
@@ -283,7 +348,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   getSubscribedCommunities: () => {
-    const { snapshots, subscribedCommunityIds, likedIds, bookmarkedIds } = get()
+    const { snapshots, subscribedCommunityIds, likedIds, bookmarkedIds, readSnapshotIds } = get()
     const result: SubscribedCommunityInfo[] = []
     subscribedCommunityIds.forEach(cId => {
       const community = getCommunityById(cId)
@@ -319,6 +384,13 @@ export const useAppStore = create<AppState>((set, get) => ({
           isBookmarked: bookmarkedIds.has(s.id)
         }))
 
+      let unreadCount = 0
+      snapshots
+        .filter(s => s.communityName === community.name && isRecent(s.createdAt))
+        .forEach(s => {
+          if (!readSnapshotIds.has(s.id)) unreadCount++
+        })
+
       result.push({
         id: cId,
         name: community.name,
@@ -327,29 +399,74 @@ export const useAppStore = create<AppState>((set, get) => ({
         latestDate: noSnapshots ? '' : approved[0].collectDate,
         noSnapshots,
         recentlyAdded,
-        recentlyApproved
+        recentlyApproved,
+        unreadCount
       })
     })
     return result
   },
 
+  getSubscriptionUpdates: () => {
+    const { snapshots, subscribedCommunityIds, readSnapshotIds } = get()
+    const updates: UpdateItem[] = []
+    subscribedCommunityIds.forEach(cId => {
+      const community = getCommunityById(cId)
+      if (!community) return
+      snapshots
+        .filter(s => s.communityName === community.name && isRecent(s.createdAt))
+        .forEach(s => {
+          updates.push({
+            id: `update_${s.id}_added`,
+            snapshotId: s.id,
+            communityId: cId,
+            communityName: community.name,
+            title: s.title,
+            type: 'added',
+            isRead: readSnapshotIds.has(s.id),
+            date: s.createdAt
+          })
+          if (s.status === 'approved') {
+            updates.push({
+              id: `update_${s.id}_approved`,
+              snapshotId: s.id,
+              communityId: cId,
+              communityName: community.name,
+              title: s.title,
+              type: 'approved',
+              isRead: readSnapshotIds.has(s.id),
+              date: s.createdAt
+            })
+          }
+        })
+    })
+    updates.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    return updates
+  },
+
   getSubscriptionSummary: () => {
-    const { snapshots, subscribedCommunityIds } = get()
+    const { snapshots, subscribedCommunityIds, readSnapshotIds } = get()
+    let unreadCount = 0
     const recentUpdateCommunities: { id: string; name: string }[] = []
     subscribedCommunityIds.forEach(cId => {
       const community = getCommunityById(cId)
       if (!community) return
-      const hasRecent = snapshots.some(
-        s => s.communityName === community.name && isRecent(s.createdAt)
-      )
-      if (hasRecent) {
+      let communityHasUnread = false
+      snapshots
+        .filter(s => s.communityName === community.name && isRecent(s.createdAt))
+        .forEach(s => {
+          if (!readSnapshotIds.has(s.id)) {
+            unreadCount++
+            communityHasUnread = true
+          }
+        })
+      if (communityHasUnread) {
         recentUpdateCommunities.push({ id: cId, name: community.name })
       }
     })
     return {
       totalSubscriptions: subscribedCommunityIds.size,
-      recentUpdateCount: recentUpdateCommunities.length,
-      recentUpdateCommunities
+      unreadUpdateCount: unreadCount,
+      recentUpdateCount: recentUpdateCommunities.length
     }
   },
 

@@ -7,7 +7,8 @@ export default defineAppConfig({
     'pages/map/index',
     'pages/topic/index',
     'pages/review/index',
-    'pages/detail/index'
+    'pages/detail/index',
+    'pages/updates/index'
   ],
   window: {
     backgroundTextStyle: 'light',

@@ -109,6 +109,19 @@
   font-weight: $font-weight-medium;
 }
 
+.markAllRow {
+  padding: $spacing-sm 0;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.markAllRowText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
 .tabs {
   display: flex;
   background: $color-bg-card;
@@ -219,10 +232,45 @@
   justify-content: space-between;
 }
 
+.subCardTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.unreadDot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  flex-shrink: 0;
+}
+
 .subCardName {
   font-size: $font-size-md;
   font-weight: $font-weight-medium;
   color: $color-text-primary;
+}
+
+.subCardActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.unsubscribeBtn {
+  padding: 4rpx 16rpx;
+  border: 2rpx solid $color-divider;
+  border-radius: $radius-round;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.unsubscribeBtnText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
 }
 
 .subCardArrow {

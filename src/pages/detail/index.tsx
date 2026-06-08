@@ -26,13 +26,16 @@ const DetailPage: React.FC = () => {
     toggleBookmark,
     claimSnapshot,
     toggleSubscribe,
-    isSubscribed
+    isSubscribed,
+    markSnapshotRead
   } = useAppStore()
 
   useEffect(() => {
     const params = Taro.getCurrentInstance().router?.params
     if (params?.id) {
-      setSnapshotId(decodeURIComponent(params.id))
+      const id = decodeURIComponent(params.id)
+      setSnapshotId(id)
+      markSnapshotRead(id)
     }
   }, [])
 
