@@ -137,3 +137,76 @@
   flex: 1;
   @include text-ellipsis;
 }
+
+.communityHeader {
+  padding: $spacing-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.communityTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  display: block;
+}
+
+.communityMeta {
+  display: flex;
+  gap: $spacing-lg;
+  margin-top: $spacing-sm;
+}
+
+.communityMetaText {
+  font-size: $font-size-sm;
+  color: $color-accent-gold;
+}
+
+.subBtn {
+  margin-top: $spacing-md;
+  padding: 16rpx $spacing-xl;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-round;
+  display: inline-flex;
+  border: 2rpx solid rgba(255, 255, 255, 0.4);
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.subActive {
+  background: $color-text-white;
+  border-color: $color-text-white;
+}
+
+.subBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.subBtnTextActive {
+  color: $color-primary;
+}
+
+.communitySnapshotList {
+  padding: $spacing-lg;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

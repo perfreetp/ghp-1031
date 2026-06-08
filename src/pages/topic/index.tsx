@@ -1,14 +1,33 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, Image, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
+import classnames from 'classnames'
 import { mockTopics } from '@/data/topics'
+import { mockCommunities } from '@/data/communities'
+import { useAppStore } from '@/store/useAppStore'
 import PosterCard from '@/components/PosterCard'
+import SnapshotCard from '@/components/SnapshotCard'
 import styles from './index.module.scss'
 
 const TopicPage: React.FC = () => {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null)
+  const [communityName, setCommunityName] = useState<string>('')
+
+  const { toggleLike, toggleBookmark, toggleSubscribe, isSubscribed, getSnapshotsByCommunity } = useAppStore()
+
+  useEffect(() => {
+    const params = Taro.getCurrentInstance().router?.params
+    if (params?.communityName) {
+      setCommunityName(decodeURIComponent(params.communityName))
+    }
+  }, [])
 
   const selectedTopic = mockTopics.find(t => t.id === selectedTopicId)
+
+  const communitySnapshots = communityName ? getSnapshotsByCommunity(communityName) : []
+  const communityInfo = communityName
+    ? mockCommunities.find(c => c.name === communityName)
+    : null
 
   const handleTopicClick = (topicId: string) => {
     setSelectedTopicId(topicId)
@@ -21,6 +40,16 @@ const TopicPage: React.FC = () => {
     }
   }
 
+  const handleSubscribe = (communityId: string) => {
+    toggleSubscribe(communityId)
+    const sub = !isSubscribed(communityId)
+    Taro.showToast({ title: sub ? '已订阅' : '已取消订阅', icon: 'none' })
+  }
+
+  const handleShare = (id: string) => {
+    Taro.showShareMenu({ withShareTicket: true })
+  }
+
   const announcements = [
     '阳光花园社区2024年度工作总结',
     '翠湖社区端午活动报名通知',
@@ -28,6 +57,49 @@ const TopicPage: React.FC = () => {
     '银杏苑社区春节慰问发放通知',
     '龙腾社区环境卫生整治行动公告'
   ]
+
+  if (communityName && communityInfo) {
+    return (
+      <View className={styles.container}>
+        <ScrollView scrollY style={{ height: '100vh' }}>
+          <View className={styles.communityHeader}>
+            <Text className={styles.communityTitle}>{communityName}</Text>
+            <View className={styles.communityMeta}>
+              <Text className={styles.communityMetaText}>{communityInfo.district}</Text>
+              <Text className={styles.communityMetaText}>{communitySnapshots.length}个快照</Text>
+            </View>
+            <View
+              className={classnames(styles.subBtn, isSubscribed(communityInfo.id) && styles.subActive)}
+              onClick={() => handleSubscribe(communityInfo.id)}
+            >
+              <Text className={classnames(styles.subBtnText, isSubscribed(communityInfo.id) && styles.subBtnTextActive)}>
+                {isSubscribed(communityInfo.id) ? '已订阅' : '+ 订阅社区更新'}
+              </Text>
+            </View>
+          </View>
+
+          <View className={styles.communitySnapshotList}>
+            {communitySnapshots.length > 0 ? (
+              communitySnapshots.map((snapshot) => (
+                <SnapshotCard
+                  key={snapshot.id}
+                  snapshot={snapshot}
+                  onLike={toggleLike}
+                  onBookmark={toggleBookmark}
+                  onShare={handleShare}
+                />
+              ))
+            ) : (
+              <View className={styles.emptyState}>
+                <Text className={styles.emptyIcon}>📭</Text>
+                <Text className={styles.emptyText}>该社区暂无快照</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </View>
+    )
+  }
 
   if (selectedTopic) {
     return (

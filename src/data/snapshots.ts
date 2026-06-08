@@ -18,7 +18,9 @@ export const mockSnapshots: Snapshot[] = [
     status: 'approved',
     contributorId: 'u1',
     contributorName: '张阿姨',
-    createdAt: '2024-03-15T10:30:00Z'
+    createdAt: '2024-03-15T10:30:00Z',
+    isClaimed: true,
+    claimedBy: 'u1'
   },
   {
     id: 's2',
@@ -35,9 +37,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: false,
     category: 'notice',
     status: 'approved',
-    contributorId: 'u2',
-    contributorName: '李大爷',
-    createdAt: '2024-05-20T14:20:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-05-20T14:20:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's3',
@@ -54,9 +58,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: true,
     category: 'activity',
     status: 'approved',
-    contributorId: 'u3',
-    contributorName: '王叔叔',
-    createdAt: '2024-06-10T09:15:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-06-10T09:15:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's4',
@@ -75,7 +81,9 @@ export const mockSnapshots: Snapshot[] = [
     status: 'approved',
     contributorId: 'u1',
     contributorName: '张阿姨',
-    createdAt: '2024-02-28T16:45:00Z'
+    createdAt: '2024-02-28T16:45:00Z',
+    isClaimed: true,
+    claimedBy: 'u1'
   },
   {
     id: 's5',
@@ -92,9 +100,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: false,
     category: 'notice',
     status: 'approved',
-    contributorId: 'u4',
-    contributorName: '赵姐',
-    createdAt: '2024-04-05T11:00:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-04-05T11:00:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's6',
@@ -111,9 +121,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: true,
     category: 'activity',
     status: 'approved',
-    contributorId: 'u5',
-    contributorName: '刘师傅',
-    createdAt: '2024-07-22T08:30:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-07-22T08:30:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's7',
@@ -130,9 +142,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: false,
     category: 'official',
     status: 'approved',
-    contributorId: 'u2',
-    contributorName: '李大爷',
-    createdAt: '2024-01-10T13:20:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-01-10T13:20:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's8',
@@ -149,9 +163,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: false,
     category: 'notice',
     status: 'approved',
-    contributorId: 'u3',
-    contributorName: '王叔叔',
-    createdAt: '2024-08-01T07:00:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-08-01T07:00:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's9',
@@ -168,9 +184,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: true,
     category: 'activity',
     status: 'approved',
-    contributorId: 'u4',
-    contributorName: '赵姐',
-    createdAt: '2024-09-12T15:40:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-09-12T15:40:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's10',
@@ -187,9 +205,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: false,
     category: 'notice',
     status: 'approved',
-    contributorId: 'u5',
-    contributorName: '刘师傅',
-    createdAt: '2024-10-05T10:00:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-10-05T10:00:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's11',
@@ -206,9 +226,11 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: false,
     category: 'official',
     status: 'pending',
-    contributorId: 'u1',
-    contributorName: '张阿姨',
-    createdAt: '2024-11-18T09:00:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-11-18T09:00:00Z',
+    isClaimed: false,
+    claimedBy: ''
   },
   {
     id: 's12',
@@ -225,8 +247,10 @@ export const mockSnapshots: Snapshot[] = [
     isBookmarked: true,
     category: 'activity',
     status: 'pending',
-    contributorId: 'u3',
-    contributorName: '王叔叔',
-    createdAt: '2024-12-20T14:00:00Z'
+    contributorId: '',
+    contributorName: '',
+    createdAt: '2024-12-20T14:00:00Z',
+    isClaimed: false,
+    claimedBy: ''
   }
 ]

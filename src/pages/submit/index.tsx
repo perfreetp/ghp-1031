@@ -95,7 +95,9 @@ const SubmitPage: React.FC = () => {
       status: 'pending' as const,
       contributorId: 'u_current',
       contributorName: '我',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      isClaimed: true,
+      claimedBy: 'u_current'
     }
 
     addSnapshot(newSnapshot)

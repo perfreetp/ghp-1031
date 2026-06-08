@@ -9,7 +9,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.4704,
     snapshotCount: 8,
     latestSnapshotDate: '2024-03-15',
-    isSubscribed: true,
     coverUrl: 'https://picsum.photos/id/787/200/200'
   },
   {
@@ -20,7 +19,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.3105,
     snapshotCount: 12,
     latestSnapshotDate: '2024-05-20',
-    isSubscribed: false,
     coverUrl: 'https://picsum.photos/id/1018/200/200'
   },
   {
@@ -31,7 +29,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.4316,
     snapshotCount: 5,
     latestSnapshotDate: '2024-06-10',
-    isSubscribed: true,
     coverUrl: 'https://picsum.photos/id/312/200/200'
   },
   {
@@ -42,7 +39,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.4187,
     snapshotCount: 15,
     latestSnapshotDate: '2024-02-28',
-    isSubscribed: false,
     coverUrl: 'https://picsum.photos/id/1082/200/200'
   },
   {
@@ -53,7 +49,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.3567,
     snapshotCount: 3,
     latestSnapshotDate: '2024-04-05',
-    isSubscribed: true,
     coverUrl: 'https://picsum.photos/id/1015/200/200'
   },
   {
@@ -64,7 +59,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.2125,
     snapshotCount: 7,
     latestSnapshotDate: '2024-07-22',
-    isSubscribed: false,
     coverUrl: 'https://picsum.photos/id/401/200/200'
   },
   {
@@ -75,7 +69,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.2877,
     snapshotCount: 9,
     latestSnapshotDate: '2024-01-10',
-    isSubscribed: true,
     coverUrl: 'https://picsum.photos/id/1039/200/200'
   },
   {
@@ -86,7 +79,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.4378,
     snapshotCount: 6,
     latestSnapshotDate: '2024-08-01',
-    isSubscribed: false,
     coverUrl: 'https://picsum.photos/id/835/200/200'
   },
   {
@@ -97,7 +89,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.6620,
     snapshotCount: 4,
     latestSnapshotDate: '2024-09-12',
-    isSubscribed: true,
     coverUrl: 'https://picsum.photos/id/570/200/200'
   },
   {
@@ -108,7 +99,6 @@ export const mockCommunities: Community[] = [
     longitude: 116.5060,
     snapshotCount: 11,
     latestSnapshotDate: '2024-10-05',
-    isSubscribed: false,
     coverUrl: 'https://picsum.photos/id/625/200/200'
   }
 ]

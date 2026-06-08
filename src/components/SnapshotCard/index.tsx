@@ -10,6 +10,9 @@ interface SnapshotCardProps {
   onLike?: (id: string) => void
   onBookmark?: (id: string) => void
   onShare?: (id: string) => void
+  onClaim?: (id: string) => void
+  showClaim?: boolean
+  showStatus?: boolean
 }
 
 const categoryLabels: Record<string, string> = {
@@ -19,7 +22,21 @@ const categoryLabels: Record<string, string> = {
   other: '其他'
 }
 
-const SnapshotCard: React.FC<SnapshotCardProps> = ({ snapshot, onLike, onBookmark, onShare }) => {
+const statusLabels: Record<string, { text: string; color: string }> = {
+  pending: { text: '待审核', color: '#FAAD14' },
+  approved: { text: '已通过', color: '#52C41A' },
+  rejected: { text: '已驳回', color: '#F5222D' }
+}
+
+const SnapshotCard: React.FC<SnapshotCardProps> = ({
+  snapshot,
+  onLike,
+  onBookmark,
+  onShare,
+  onClaim,
+  showClaim = false,
+  showStatus = false
+}) => {
   const handleLike = (e) => {
     e.stopPropagation()
     onLike?.(snapshot.id)
@@ -35,12 +52,15 @@ const SnapshotCard: React.FC<SnapshotCardProps> = ({ snapshot, onLike, onBookmar
     onShare?.(snapshot.id)
   }
 
-  const handleCardClick = () => {
-    Taro.showToast({ title: '快照详情功能开发中', icon: 'none' })
+  const handleClaim = (e) => {
+    e.stopPropagation()
+    onClaim?.(snapshot.id)
   }
 
+  const canClaim = showClaim && !snapshot.isClaimed && snapshot.status === 'approved'
+
   return (
-    <View className={styles.card} onClick={handleCardClick}>
+    <View className={styles.card}>
       <View className={styles.imageWrap}>
         <Image
           className={styles.image}
@@ -62,6 +82,20 @@ const SnapshotCard: React.FC<SnapshotCardProps> = ({ snapshot, onLike, onBookmar
           ))}
         </View>
         <Text className={styles.desc}>{snapshot.description}</Text>
+
+        {showStatus && (
+          <View className={styles.statusRow}>
+            <View className={styles.statusBadge} style={{ background: `${statusLabels[snapshot.status].color}20` }}>
+              <Text className={styles.statusText} style={{ color: statusLabels[snapshot.status].color }}>
+                {statusLabels[snapshot.status].text}
+              </Text>
+            </View>
+            {snapshot.contributorName && (
+              <Text className={styles.contributor}>贡献者：{snapshot.contributorName}</Text>
+            )}
+          </View>
+        )}
+
         <View className={styles.footer}>
           <Text className={styles.date}>{snapshot.collectDate}</Text>
           <View className={styles.actions}>
@@ -81,6 +115,18 @@ const SnapshotCard: React.FC<SnapshotCardProps> = ({ snapshot, onLike, onBookmar
             </View>
           </View>
         </View>
+
+        {canClaim && (
+          <View className={styles.claimBtn} onClick={handleClaim}>
+            <Text className={styles.claimBtnText}>认领贡献</Text>
+          </View>
+        )}
+
+        {showClaim && snapshot.isClaimed && snapshot.claimedBy === 'u_current' && (
+          <View className={styles.claimedTag}>
+            <Text className={styles.claimedTagText}>已认领</Text>
+          </View>
+        )}
       </View>
     </View>
   )

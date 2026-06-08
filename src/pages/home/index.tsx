@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import { View, Text, Image, Swiper, SwiperItem, ScrollView } from '@tarojs/components'
+import { View, Text, Input, Image, Swiper, SwiperItem, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useAppStore } from '@/store/useAppStore'
 import { mockCommunities } from '@/data/communities'
-import { mockTopics } from '@/data/topics'
 import SnapshotCard from '@/components/SnapshotCard'
 import styles from './index.module.scss'
 
@@ -26,9 +25,11 @@ const HomePage: React.FC = () => {
       isBookmarked: bookmarkedIds.has(s.id)
     }))
 
-  const handleSearch = () => {
+  const handleSearchConfirm = () => {
     if (searchValue.trim()) {
-      Taro.navigateTo({ url: `/pages/browse/index?keyword=${encodeURIComponent(searchValue)}` })
+      Taro.switchTab({ url: '/pages/browse/index' }).then(() => {
+        useAppStore.getState().setSearchKeyword(searchValue.trim())
+      })
     }
   }
 
@@ -47,9 +48,17 @@ const HomePage: React.FC = () => {
         <Text className={styles.subGreeting}>记忆不褪色，社区在传承</Text>
       </View>
 
-      <View className={styles.searchWrap} onClick={handleSearch}>
+      <View className={styles.searchWrap}>
         <Text className={styles.searchIcon}>🔍</Text>
-        <Text className={styles.searchPlaceholder}>搜索社区名称或活动...</Text>
+        <Input
+          className={styles.searchInput}
+          placeholder="搜索活动名称或社区名称..."
+          placeholderClass={styles.searchPlaceholder}
+          value={searchValue}
+          onInput={(e) => setSearchValue(e.detail.value)}
+          onConfirm={handleSearchConfirm}
+          confirmType="search"
+        />
       </View>
 
       <View className={styles.swiperWrap}>

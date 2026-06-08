@@ -16,6 +16,8 @@ export interface Snapshot {
   contributorId: string;
   contributorName: string;
   createdAt: string;
+  isClaimed: boolean;
+  claimedBy: string;
 }
 
 export interface Community {
@@ -26,7 +28,6 @@ export interface Community {
   longitude: number;
   snapshotCount: number;
   latestSnapshotDate: string;
-  isSubscribed: boolean;
   coverUrl: string;
 }
 
@@ -38,27 +39,6 @@ export interface Topic {
   snapshotIds: string[];
   createdAt: string;
   announcementCount: number;
-}
-
-export interface ReviewItem {
-  id: string;
-  snapshotId: string;
-  snapshotTitle: string;
-  snapshotImageUrl: string;
-  communityName: string;
-  contributorName: string;
-  submittedAt: string;
-  status: 'pending' | 'approved' | 'rejected';
-}
-
-export interface UserProfile {
-  id: string;
-  nickname: string;
-  avatar: string;
-  contributionCount: number;
-  bookmarkCount: number;
-  subscriptionCount: number;
-  reviewCount: number;
 }
 
 export type TabType = 'contributions' | 'bookmarks' | 'subscriptions';

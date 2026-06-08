@@ -18,6 +18,7 @@ const BrowsePage: React.FC = () => {
     setSortType,
     toggleLike,
     toggleBookmark,
+    claimSnapshot,
     getFilteredSnapshots
   } = useAppStore()
 
@@ -26,10 +27,15 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     const params = Taro.getCurrentInstance().router?.params
     if (params?.keyword) {
-      setSearchKeyword(decodeURIComponent(params.keyword))
-      setLocalKeyword(decodeURIComponent(params.keyword))
+      const kw = decodeURIComponent(params.keyword)
+      setSearchKeyword(kw)
+      setLocalKeyword(kw)
     }
   }, [])
+
+  useEffect(() => {
+    setLocalKeyword(searchKeyword)
+  }, [searchKeyword])
 
   const handleSearchConfirm = () => {
     setSearchKeyword(localKeyword)
@@ -41,6 +47,17 @@ const BrowsePage: React.FC = () => {
 
   const handleShare = (id: string) => {
     Taro.showShareMenu({ withShareTicket: true })
+  }
+
+  const handleClaim = (id: string) => {
+    claimSnapshot(id)
+    Taro.showToast({ title: '认领成功', icon: 'success' })
+    console.info('[Browse] Claimed snapshot:', id)
+  }
+
+  const handleClearSearch = () => {
+    setSearchKeyword('')
+    setLocalKeyword('')
   }
 
   const filteredSnapshots = getFilteredSnapshots()
@@ -55,8 +72,22 @@ const BrowsePage: React.FC = () => {
           value={localKeyword}
           onInput={(e) => setLocalKeyword(e.detail.value)}
           onConfirm={handleSearchConfirm}
+          confirmType="search"
         />
+        {searchKeyword && (
+          <View className={styles.clearBtn} onClick={handleClearSearch}>
+            <Text className={styles.clearText}>✕</Text>
+          </View>
+        )}
       </View>
+
+      {searchKeyword && (
+        <View className={styles.searchHint}>
+          <Text className={styles.searchHintText}>
+            搜索「{searchKeyword}」找到 {filteredSnapshots.length} 个结果
+          </Text>
+        </View>
+      )}
 
       <View className={styles.filterRow}>
         <TagFilter selected={category} onChange={setCategory} />
@@ -88,6 +119,8 @@ const BrowsePage: React.FC = () => {
               onLike={toggleLike}
               onBookmark={toggleBookmark}
               onShare={handleShare}
+              onClaim={handleClaim}
+              showClaim={true}
             />
           ))
         ) : (

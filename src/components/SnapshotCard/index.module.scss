@@ -143,3 +143,62 @@
   font-size: $font-size-xs;
   color: $color-text-tertiary;
 }
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-top: $spacing-sm;
+}
+
+.statusBadge {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+}
+
+.statusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.contributor {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.claimBtn {
+  margin-top: $spacing-md;
+  height: $button-height-sm;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  @include flex-center;
+  @include button-reset;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.claimBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.claimedTag {
+  margin-top: $spacing-md;
+  padding: 8rpx 24rpx;
+  background: rgba($color-success, 0.1);
+  border-radius: $radius-round;
+  display: inline-flex;
+}
+
+.claimedTagText {
+  font-size: $font-size-xs;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
